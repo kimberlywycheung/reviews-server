@@ -1,5 +1,24 @@
 {
   "dependencies": {
-    "postgres": "^3.3.2"
-  }
+    "csv-parse": "^5.3.3",
+    "pg": "^8.8.0"
+  },
+  "name": "reviews-server",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teamVersace/reviews-server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teamVersace/reviews-server/issues"
+  },
+  "homepage": "https://github.com/teamVersace/reviews-server#readme"
 }
