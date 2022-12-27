@@ -4,9 +4,9 @@ var models = require('../models/index.js');
 //   console.log(data);
 // })
 
-models.getMetadata('1', (data) => {
-  console.log(data);
-})
+// models.getMetadata('1', (data) => {
+//   console.log(data);
+// })
 
 module.exports = {
   getReviews: (req, res) => {
@@ -31,7 +31,14 @@ module.exports = {
 
   },
   markHelpful: (req, res) => {
-
+    app.put('/reviews/:review_id/helpful', controller.markHelpful);
+    models.markHelpful(req.params.review_id, (data, err) => {
+      if (err) {
+        res.status(401).send(err);
+      } else {
+        res.status(201).send();
+      }
+    })
   },
   report: (req, res) => {
 

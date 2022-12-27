@@ -2,6 +2,7 @@ var pool = require('../db/postgres.js');
 
 module.exports = {
   getReviews: (id, cb) => {
+    console.log('models id', id);
     let reviews = {
       product: id,
       page: 0,
@@ -114,7 +115,17 @@ module.exports = {
 
   },
   markHelpful: (id, cb) => {
-
+    pool
+      .query(`
+        UPDATE reviews
+        SET helpfulness = (
+          SELECT helpfulness
+          FROM reviews
+          WHERE id = ${id}
+        ) + 1
+        WHERE id = ${id};
+      `)
+      .catch((err) => setImmediate(() => console.log(err)));
   },
   report: (id, cb) => {
 
