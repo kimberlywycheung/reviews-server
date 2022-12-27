@@ -40,7 +40,7 @@ CREATE TABLE review_characteristics (
   -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
 );
 
--- EXTRACT
+-- EXTRACT/LOAD
 \copy reviews FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews.csv' DELIMITER ',' CSV HEADER;
 \copy photos FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews_photos.csv' DELIMITER ',' CSV HEADER;
 \copy review_characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
@@ -48,7 +48,11 @@ CREATE TABLE review_characteristics (
 
 -- TRANSFORM
 
-
+-- CREATE INDEX product_id ON reviews (id ASC);
+-- CREATE INDEX review_id ON photos(review_id ASC);
+-- CREATE INDEX char_prod_id ON characteristics(product_id ASC);
+-- CREATE INDEX char_review_id ON review_characteristics(characteristic_id, review_id);
+-- CREATE INDEX product_id ON reviews(id);
 
 
 
@@ -70,7 +74,9 @@ CREATE TABLE review_characteristics (
 -- CREATE TABLE products (
 --   id SERIAL PRIMARY KEY NOT NULL,
 --   product INTEGER NOT NULL,
---   results INTEGER NOT NULL,
+  -- page INTEGER NOT NULL,
+  -- count INTEGER NOT NULL,
+--   results INTEGER[] NOT NULL,
 --   CONSTRAINT fk_results FOREIGN KEY (results) REFERENCES reviews(review_id)
 -- );
 --   -- page INTEGER NOT NULL,
