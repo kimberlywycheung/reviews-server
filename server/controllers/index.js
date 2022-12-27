@@ -31,7 +31,6 @@ module.exports = {
 
   },
   markHelpful: (req, res) => {
-    app.put('/reviews/:review_id/helpful', controller.markHelpful);
     models.markHelpful(req.params.review_id, (data, err) => {
       if (err) {
         res.status(401).send(err);
@@ -41,6 +40,12 @@ module.exports = {
     })
   },
   report: (req, res) => {
-
+    models.report(req.params.review_id, (data, err) => {
+      if (err) {
+        res.status(401).send(err);
+      } else {
+        res.status(201).send();
+      }
+    })
   }
 };

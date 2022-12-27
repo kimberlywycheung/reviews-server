@@ -16,7 +16,7 @@ module.exports = {
         FROM reviews r
           LEFT JOIN photos p
           ON r.id = p.review_id
-          WHERE product_id = ${id}
+        WHERE r.product_id = ${id} AND r.reported = false
         GROUP BY r.id;
       `)
       .then(({ rows }) => {
@@ -128,6 +128,12 @@ module.exports = {
       .catch((err) => setImmediate(() => console.log(err)));
   },
   report: (id, cb) => {
-
+    pool
+      .query(`
+        UPDATE reviews
+        SET reported = true
+        WHERE id = ${id};
+      `)
+      .catch((err) => setImmediate(() => console.log(err)));
   }
 };
