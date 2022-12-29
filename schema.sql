@@ -4,7 +4,7 @@ CREATE DATABASE rr;
 \connect rr;
 
 CREATE TABLE reviews (
-  id INTEGER PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY NOT NULL,
   product_id INTEGER NOT NULL,
   rating INTEGER NOT NULL,
   date BIGINT NOT NULL,
@@ -19,20 +19,20 @@ CREATE TABLE reviews (
 );
 
 CREATE TABLE photos (
-  id INTEGER PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY NOT NULL,
   review_id INTEGER NOT NULL,
   url VARCHAR(1000) NOT NULL
   -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
 );
 
 CREATE TABLE characteristics (
-  id INTEGER PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY NOT NULL,
   product_id INTEGER NOT NULL,
   name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE review_characteristics (
-  id INTEGER PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY NOT NULL,
   characteristic_id INTEGER NOT NULL,
   review_id INTEGER NOT NULL,
   value INTEGER NOT NULL
