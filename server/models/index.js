@@ -136,8 +136,8 @@ module.exports = {
           BEGIN
             FOR url IN ${review.photos}
             LOOP
-              INSERT INTO photos (${reviewId}, url)
-              VALUES (url)
+              INSERT INTO photos (review_id, url)
+              VALUES (${reviewId}, url)
             END LOOP;
           END $$;
       `)
