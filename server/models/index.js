@@ -111,9 +111,56 @@ module.exports = {
       })
       .catch((err) => setImmediate(() => console.log(err)));
   },
-  postReview: (review, cb) => {
 
+  postReview: async (review, cb) => {
+    // add to reviews table
+    await pool
+      .query(`
+        INSERT INTO reviews (product_id, rating, summary, body, recommend, reviewer_name, reviewer_email)
+        VALUES (${review.product_id}, ${review.rating}, ${review.summary},
+          ${review.body}, ${review.recommend}, ${review.name}, ${review.email});
+      `)
+      .catch((err) => setImmediate(() => console.log(err)));
+
+    // grab review id of newly added review
+    let reviewId = 0;
+    await pool
+      .query(`SELECT id FROM reviews ORDER BY id DESC LIMIT 1;`)
+      .then((id) => { reviewId = id; })
+      .catch((err) => setImmediate(() => console.log(err)));
+
+    // add to photos table
+    await pool
+      .query(`
+          DO $$
+          BEGIN
+            FOR url IN ${review.photos}
+            LOOP
+              INSERT INTO photos (${reviewId}, url)
+              VALUES (url)
+            END LOOP;
+          END $$;
+      `)
+      .catch((err) => setImmediate(() => console.log(err)));
+
+    // add to review_characteristics table
+    await pool
+      .query(`
+        DO $$
+          DECLARE
+            r record;
+          BEGIN
+            FOR r IN ${review.characteristics}
+            LOOP
+              INSERT INTO review_characteristics (characteristic_id, review_id, value)
+              VALUES (i.key, ${reviewId}, i.value)
+            END LOOP;
+          END $$;
+      `)
+      .then(() => cb())
+      .catch((err) => setImmediate(() => console.log(err)));
   },
+
   markHelpful: (id, cb) => {
     pool
       .query(`
@@ -125,8 +172,10 @@ module.exports = {
         ) + 1
         WHERE id = ${id};
       `)
+      .then(() => cb())
       .catch((err) => setImmediate(() => console.log(err)));
   },
+
   report: (id, cb) => {
     pool
       .query(`
@@ -134,6 +183,7 @@ module.exports = {
         SET reported = true
         WHERE id = ${id};
       `)
+      .then(() => cb())
       .catch((err) => setImmediate(() => console.log(err)));
   }
 };
