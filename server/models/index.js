@@ -13,8 +13,7 @@ module.exports = {
       .query(`
         SELECT r.*, JSON_AGG(JSON_BUILD_OBJECT('id', p.id, 'url', p.url)) AS photos
         FROM reviews r
-          LEFT JOIN photos p
-          ON r.id = p.review_id
+          LEFT JOIN photos p ON r.id = p.review_id
         WHERE r.product_id = ${id} AND r.reported = false
         GROUP BY r.id;
       `)
@@ -113,6 +112,7 @@ module.exports = {
 
   postReview: async (review, cb) => {
     const date = new Date();
+    console.log(review);
     const summary = review.summary.replace("'", "''");
     const body = review.summary.replace("'", "''");
     const name = review.summary.replace("'", "''");

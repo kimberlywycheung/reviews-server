@@ -1,20 +1,13 @@
 var models = require('../models/index.js');
 
-// models.getReviews('2', (data) => {
-//   console.log(data);
-// })
-
-// models.getMetadata('1', (data) => {
-//   console.log(data);
-// })
-
 module.exports = {
   getReviews: (req, res) => {
+    console.log('getting reviews');
     models.getReviews(req.params.product_id, (data, err) => {
       if (err) {
         res.status(400).send(err);
       } else {
-        res.status(200).send(data)
+        res.status(200).send(data);
       }
     });
   },
@@ -23,12 +16,15 @@ module.exports = {
       if (err) {
         res.status(400).send(err);
       } else {
-        res.status(200).send(data)
+        res.status(200).send(data);
       }
     });
   },
   postReview: (req, res) => {
-    models.postReview(req.body, (data, err) => {
+    console.log(req);
+    console.log(req.data);
+    console.log(req.body);
+    models.postReview(req.data, (data, err) => {
       if (err) {
         res.status(401).send(err);
       } else {

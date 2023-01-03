@@ -54,13 +54,12 @@ SELECT setVal('"review_characteristics_id_seq"', (SELECT MAX (id) FROM review_ch
 SELECT setVal('"characteristics_id_seq"', (SELECT MAX (id) FROM characteristics) + 1);
 
 -- TRANSFORM
-
-
--- CREATE INDEX product_id ON reviews (id ASC);
--- CREATE INDEX review_id ON photos(review_id ASC);
+CREATE INDEX r_id ON reviews (id ASC);
+CREATE INDEX r_product_id ON reviews (product_id ASC);
+CLUSTER reviews USING r_product_id;
+CREATE INDEX p_review_id ON photos(review_id ASC);
 -- CREATE INDEX char_prod_id ON characteristics(product_id ASC);
 -- CREATE INDEX char_review_id ON review_characteristics(characteristic_id, review_id);
--- CREATE INDEX product_id ON reviews(id);
 
 
 

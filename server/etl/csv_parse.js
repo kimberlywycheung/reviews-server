@@ -7,8 +7,6 @@ let photos = [];
 let characteristics = [];
 let review_characteristics = [];
 
-
-
 const parseData = (filename, saveTo) => {
   fs.createReadStream(filename)
   .pipe(parse({
