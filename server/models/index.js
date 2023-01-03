@@ -2,7 +2,6 @@ var pool = require('../db/postgres.js');
 
 module.exports = {
   getReviews: (id, cb) => {
-    console.log('models id', id);
     let reviews = {
       product: id,
       page: 0,
@@ -28,7 +27,7 @@ module.exports = {
             recommend: review.recommend,
             response: review.response,
             body: review.body,
-            date: review.date,
+            date: new Date(review.date),
             reviewer_name: review.reviewer_name,
             reviewer_email: review.reviewer_email,
             helpfulness: review.helpfulness,
@@ -113,52 +112,51 @@ module.exports = {
   },
 
   postReview: async (review, cb) => {
+    const date = new Date();
+    const summary = review.summary.replace("'", "''");
+    const body = review.summary.replace("'", "''");
+    const name = review.summary.replace("'", "''");
+
     // add to reviews table
     await pool
       .query(`
-        INSERT INTO reviews (product_id, rating, summary, body, recommend, reviewer_name, reviewer_email)
-        VALUES (${review.product_id}, ${review.rating}, ${review.summary},
-          ${review.body}, ${review.recommend}, ${review.name}, ${review.email});
+        INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reviewer_name, reviewer_email)
+        VALUES (${review.product_id}, ${review.rating}, ${date.getTime()}, '${summary}',
+          '${body}', ${review.recommend}, '${name}', '${review.email}');
       `)
       .catch((err) => setImmediate(() => console.log(err)));
 
     // grab review id of newly added review
     let reviewId = 0;
+
     await pool
       .query(`SELECT id FROM reviews ORDER BY id DESC LIMIT 1;`)
-      .then((id) => { reviewId = id; })
+      .then(({ rows }) => { reviewId = rows[0].id; })
       .catch((err) => setImmediate(() => console.log(err)));
 
     // add to photos table
-    await pool
+    for (let i = 0; i < review.photos.length; i++) {
+      let url = review.photos[i];
+
+      await pool
       .query(`
-          DO $$
-          BEGIN
-            FOR url IN ${review.photos}
-            LOOP
-              INSERT INTO photos (review_id, url)
-              VALUES (${reviewId}, url)
-            END LOOP;
-          END $$;
+        INSERT INTO photos (review_id, url)
+        VALUES (${reviewId}, '${url}');
       `)
       .catch((err) => setImmediate(() => console.log(err)));
+    }
 
     // add to review_characteristics table
-    await pool
+    for (let key in review.characteristics) {
+      await pool
       .query(`
-        DO $$
-          DECLARE
-            r record;
-          BEGIN
-            FOR r IN ${review.characteristics}
-            LOOP
-              INSERT INTO review_characteristics (characteristic_id, review_id, value)
-              VALUES (i.key, ${reviewId}, i.value)
-            END LOOP;
-          END $$;
+        INSERT INTO review_characteristics (review_id, characteristic_id, value)
+        VALUES (${reviewId}, ${key}, ${review.characteristics[key]});
       `)
-      .then(() => cb())
       .catch((err) => setImmediate(() => console.log(err)));
+    }
+
+    cb();
   },
 
   markHelpful: (id, cb) => {
