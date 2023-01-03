@@ -4,35 +4,35 @@ CREATE DATABASE rr;
 \connect rr;
 
 CREATE TABLE reviews (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY,
   product_id INTEGER NOT NULL,
   rating INTEGER NOT NULL,
   date BIGINT NOT NULL,
   summary VARCHAR(1000) NOT NULL,
   body VARCHAR(1000) NOT NULL,
   recommend BOOLEAN NOT NULL,
-  reported BOOLEAN DEFAULT false NOT NULL,
+  reported BOOLEAN DEFAULT false,
   reviewer_name VARCHAR(100) NOT NULL,
   reviewer_email VARCHAR(100) NOT NULL,
-  response VARCHAR DEFAULT null NOT NULL,
-  helpfulness INTEGER NOT NULL
+  response VARCHAR DEFAULT null,
+  helpfulness INTEGER DEFAULT 0
 );
 
 CREATE TABLE photos (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY,
   review_id INTEGER NOT NULL,
   url VARCHAR(1000) NOT NULL
   -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
 );
 
 CREATE TABLE characteristics (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY,
   product_id INTEGER NOT NULL,
   name VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE review_characteristics (
-  id SERIAL PRIMARY KEY NOT NULL,
+  id SERIAL PRIMARY KEY,
   characteristic_id INTEGER NOT NULL,
   review_id INTEGER NOT NULL,
   value INTEGER NOT NULL
@@ -42,11 +42,19 @@ CREATE TABLE review_characteristics (
 
 -- EXTRACT/LOAD
 \copy reviews FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"reviews_id_seq"', (SELECT MAX (id) FROM reviews) + 1);
+
 \copy photos FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews_photos.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"photos_id_seq"', (SELECT MAX (id) FROM photos) + 1);
+
 \copy review_characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"review_characteristics_id_seq"', (SELECT MAX (id) FROM review_characteristics) + 1);
+
 \copy characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristics.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"characteristics_id_seq"', (SELECT MAX (id) FROM characteristics) + 1);
 
 -- TRANSFORM
+
 
 -- CREATE INDEX product_id ON reviews (id ASC);
 -- CREATE INDEX review_id ON photos(review_id ASC);
