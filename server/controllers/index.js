@@ -2,7 +2,6 @@ var models = require('../models/index.js');
 
 module.exports = {
   getReviews: (req, res) => {
-    console.log('getting reviews');
     models.getReviews(req.params.product_id, (data, err) => {
       if (err) {
         res.status(400).send(err);
@@ -21,10 +20,7 @@ module.exports = {
     });
   },
   postReview: (req, res) => {
-    console.log(req);
-    console.log(req.data);
-    console.log(req.body);
-    models.postReview(req.data, (data, err) => {
+    models.postReview(req.body, (data, err) => {
       if (err) {
         res.status(401).send(err);
       } else {

@@ -112,10 +112,21 @@ module.exports = {
 
   postReview: async (review, cb) => {
     const date = new Date();
-    console.log(review);
-    const summary = review.summary.replace("'", "''");
-    const body = review.summary.replace("'", "''");
-    const name = review.summary.replace("'", "''");
+
+    let summary = review.summary;
+    let body = review.body;
+    let name = review.name;
+
+    if (review.summary.indexOf("'") > -1) {
+      summary = review.summary.replace("'", "''");
+      console.log('summary', summary);
+    }
+    if (review.body.indexOf("'") > -1) {
+      body = review.body.replace("'", "''");
+    }
+    if (review.name.indexOf("'") > -1) {
+      name = review.name.replace("'", "''");
+    }
 
     // add to reviews table
     await pool
