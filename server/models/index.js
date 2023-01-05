@@ -18,6 +18,8 @@ module.exports = {
         GROUP BY r.id;
       `)
       .then(({ rows }) => {
+        console.log('ran query');
+
         rows.forEach((review) => {
           let reviewObj = {
             review_id: review.id,
