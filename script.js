@@ -23,33 +23,33 @@ export default function () {
   const product_id = Math.floor(Math.random() * (100001) + 900009);
 
   // check get reviews
-  // const reviews = http.get(http.url`${BASE_URL}/reviews/${product_id}`);
-  // check(reviews, {
-  //   'GET reviews status is successful': (res) => res.status === 200,
-  //   'GET review response exists': (res) => res.body.length > 0
-  // });
+  const reviews = http.get(http.url`${BASE_URL}/reviews/${product_id}`);
+  check(reviews, {
+    'GET reviews status is successful': (res) => res.status === 200,
+    'GET review response exists': (res) => res.body.length > 0
+  });
 
-  // // check getMetadata
-  // const metadata = http.get(http.url`${BASE_URL}/reviews/meta/${product_id}`);
-  // check(metadata, {
-  //   'GET metadata status is successful': (res) => res.status === 200,
-  //   'GET metadata response exists': (res) => res.body.length > 0
-  // });
+  // check getMetadata
+  const metadata = http.get(http.url`${BASE_URL}/reviews/meta/${product_id}`);
+  check(metadata, {
+    'GET metadata status is successful': (res) => res.status === 200,
+    'GET metadata response exists': (res) => res.body.length > 0
+  });
 
-  // // set review id to random product within last 10% of dataset
+  // set review id to random product within last 10% of dataset
   const review_id = Math.floor(Math.random() * (5774952) + 5197456);
 
-  // check put for helpful
-  // const markHelpful = http.put(http.url`${BASE_URL}/reviews/${review_id}/helpful`);
-  // check(markHelpful, {
-  //   'PUT helpful status is successful': (res) => res.status === 204,
-  // });
+  //check put for helpful
+  const markHelpful = http.put(http.url`${BASE_URL}/reviews/${review_id}/helpful`);
+  check(markHelpful, {
+    'PUT helpful status is successful': (res) => res.status === 204,
+  });
 
-  // // check put for reported
-  // const report = http.put(http.url`${BASE_URL}/reviews/${review_id}/report`);
-  // check(report, {
-  //   'PUT report status is successful': (res) => res.status === 204,
-  // });
+  // check put for reported
+  const report = http.put(http.url`${BASE_URL}/reviews/${review_id}/report`);
+  check(report, {
+    'PUT report status is successful': (res) => res.status === 204,
+  });
 
   // check post for new review for current product
   const newReview = {

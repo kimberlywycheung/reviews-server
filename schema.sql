@@ -75,16 +75,6 @@ SET photos=(SELECT JSON_AGG(JSON_BUILD_OBJECT('id', p.id, 'url', p.url)::jsonb)
   WHERE reviews.id = p.review_id
   GROUP BY p.id);
 
-CREATE TABLE photo_count (
-  current_count INT DEFAULT 0
-);
-SELECT setVal('"current_count_seq"', (SELECT MAX (id) FROM photos));
-
--- INSERT INTO photo_count (current_count)
--- VALUES (SELECT MAX(id) FROM photos);
-
---
-
 -- CREATE TABLE reviews (
 --   review_id SERIAL NOT NULL PRIMARY KEY,
 --   rating INTEGER NOT NULL,
