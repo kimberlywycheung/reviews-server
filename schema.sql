@@ -18,40 +18,40 @@ CREATE TABLE reviews (
   helpfulness INTEGER DEFAULT 0
 );
 
--- CREATE TABLE photos (
---   id SERIAL PRIMARY KEY,
---   review_id INTEGER NOT NULL,
---   url VARCHAR(1000) NOT NULL
---   -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
--- );
+CREATE TABLE photos (
+  id SERIAL PRIMARY KEY,
+  review_id INTEGER NOT NULL,
+  url VARCHAR(1000) NOT NULL
+  -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
+);
 
--- CREATE TABLE characteristics (
---   id SERIAL PRIMARY KEY,
---   product_id INTEGER NOT NULL,
---   name VARCHAR(100) NOT NULL
--- );
+CREATE TABLE characteristics (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER NOT NULL,
+  name VARCHAR(100) NOT NULL
+);
 
--- CREATE TABLE review_characteristics (
---   id SERIAL PRIMARY KEY,
---   characteristic_id INTEGER NOT NULL,
---   review_id INTEGER NOT NULL,
---   value INTEGER NOT NULL
---   -- CONSTRAINT fk_charid FOREIGN KEY (characteristic_id) REFERENCES characteristics(id),
---   -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
--- );
+CREATE TABLE review_characteristics (
+  id SERIAL PRIMARY KEY,
+  characteristic_id INTEGER NOT NULL,
+  review_id INTEGER NOT NULL,
+  value INTEGER NOT NULL
+  -- CONSTRAINT fk_charid FOREIGN KEY (characteristic_id) REFERENCES characteristics(id),
+  -- CONSTRAINT fk_reviewid FOREIGN KEY (review_id) REFERENCES reviews(id)
+);
 
 -- EXTRACT/LOAD
 \copy reviews FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews.csv' DELIMITER ',' CSV HEADER;
 SELECT setVal('"reviews_id_seq"', (SELECT MAX (id) FROM reviews) + 1);
 
--- \copy photos FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews_photos.csv' DELIMITER ',' CSV HEADER;
--- SELECT setVal('"photos_id_seq"', (SELECT MAX (id) FROM photos) + 1);
+\copy photos FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/reviews_photos.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"photos_id_seq"', (SELECT MAX (id) FROM photos) + 1);
 
--- \copy review_characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
--- SELECT setVal('"review_characteristics_id_seq"', (SELECT MAX (id) FROM review_characteristics) + 1);
+\copy review_characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristic_reviews.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"review_characteristics_id_seq"', (SELECT MAX (id) FROM review_characteristics) + 1);
 
--- \copy characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristics.csv' DELIMITER ',' CSV HEADER;
--- SELECT setVal('"characteristics_id_seq"', (SELECT MAX (id) FROM characteristics) + 1);
+\copy characteristics FROM '/Users/kim/Desktop/HackReactor/SDC/reviews-server/dataset/characteristics.csv' DELIMITER ',' CSV HEADER;
+SELECT setVal('"characteristics_id_seq"', (SELECT MAX (id) FROM characteristics) + 1);
 
 -- TRANSFORM
 
@@ -65,6 +65,25 @@ CREATE INDEX char_r_id ON review_characteristics(characteristic_id);
 -- CREATE INDEX char_id ON characteristics (id);
 -- CREATE INDEX char_review_id ON review_characteristics(characteristic_id, review_id);
 
+-- Add photos to reviews table
+ALTER TABLE reviews
+  ADD photos jsonb DEFAULT '[]'::jsonb;
+
+UPDATE reviews
+SET photos=(SELECT JSON_AGG(JSON_BUILD_OBJECT('id', p.id, 'url', p.url)::jsonb)
+  FROM photos p
+  WHERE reviews.id = p.review_id
+  GROUP BY p.id);
+
+CREATE TABLE photo_count (
+  current_count INT DEFAULT 0
+);
+SELECT setVal('"current_count_seq"', (SELECT MAX (id) FROM photos));
+
+-- INSERT INTO photo_count (current_count)
+-- VALUES (SELECT MAX(id) FROM photos);
+
+--
 
 -- CREATE TABLE reviews (
 --   review_id SERIAL NOT NULL PRIMARY KEY,

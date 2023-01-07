@@ -1,4 +1,5 @@
 var pool = require('../db/postgres.js');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   getReviews: (id, cb) => {
@@ -11,14 +12,9 @@ module.exports = {
 
     pool
       .query(`
-        SELECT r.*, JSON_AGG(JSON_BUILD_OBJECT('id', p.id, 'url', p.url)) AS photos
-        FROM reviews r
-          LEFT JOIN photos p ON r.id = p.review_id
-        WHERE r.product_id = ${id} AND r.reported = false
-        GROUP BY r.id;
+        SELECT r.* FROM reviews r WHERE r.product_id = ${id} AND r.reported = false;
       `)
       .then(({ rows }) => {
-        console.log('ran query');
 
         rows.forEach((review) => {
           let reviewObj = {
@@ -66,7 +62,7 @@ module.exports = {
             json_agg(r.rating) AS ratings,
             json_agg(r.recommend) AS recommendations
           FROM reviews r
-          WHERE r.product_id = 1
+          WHERE r.product_id = ${id}
           GROUP BY r.product_id
         ) rr
         JOIN (
@@ -77,7 +73,7 @@ module.exports = {
             FROM characteristics c
               LEFT JOIN review_characteristics cr
               ON c.id = cr.characteristic_id
-            WHERE c.product_id = 1
+            WHERE c.product_id = ${id}
             GROUP BY c.id
         ) cv
         ON cv.product_id = rr.product_id
@@ -114,14 +110,13 @@ module.exports = {
 
   postReview: async (review, cb) => {
     const date = new Date();
-
     let summary = review.summary;
     let body = review.body;
     let name = review.name;
 
+
     if (review.summary.indexOf("'") > -1) {
       summary = review.summary.replace("'", "''");
-      console.log('summary', summary);
     }
     if (review.body.indexOf("'") > -1) {
       body = review.body.replace("'", "''");
@@ -130,44 +125,39 @@ module.exports = {
       name = review.name.replace("'", "''");
     }
 
+    const photos = JSON.stringify(review.photos.map((url) => {
+      return {
+        id: uuidv4(),
+        url: url
+      }
+    }));
+
+    let reviewId = 0;
     // add to reviews table
     await pool
       .query(`
-        INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reviewer_name, reviewer_email)
-        VALUES (${review.product_id}, ${review.rating}, ${date.getTime()}, '${summary}',
-          '${body}', ${review.recommend}, '${name}', '${review.email}');
+          INSERT INTO reviews (product_id, rating, date, summary, body, recommend, reviewer_name, reviewer_email, photos)
+          VALUES (${review.product_id}, ${review.rating}, ${date.getTime()}, '${summary}',
+            '${body}', ${review.recommend}, '${name}', '${review.email}', '${photos}')
+          RETURNING id;
       `)
+      .then(({ rows }) => { reviewId = rows[0].id })
       .catch((err) => setImmediate(() => console.log(err)));
 
-    // grab review id of newly added review
-    let reviewId = 0;
-
-    await pool
-      .query(`SELECT id FROM reviews ORDER BY id DESC LIMIT 1;`)
-      .then(({ rows }) => { reviewId = rows[0].id; })
-      .catch((err) => setImmediate(() => console.log(err)));
-
-    // add to photos table
-    for (let i = 0; i < review.photos.length; i++) {
-      let url = review.photos[i];
-
-      await pool
-      .query(`
-        INSERT INTO photos (review_id, url)
-        VALUES (${reviewId}, '${url}');
-      `)
-      .catch((err) => setImmediate(() => console.log(err)));
-    }
 
     // add to review_characteristics table
+    let characteristicsString = [];
+
     for (let key in review.characteristics) {
-      await pool
+      characteristicsString.push(`(${reviewId}, ${key}, ${review.characteristics[key]})`);
+    }
+
+    await pool
       .query(`
         INSERT INTO review_characteristics (review_id, characteristic_id, value)
-        VALUES (${reviewId}, ${key}, ${review.characteristics[key]});
+        VALUES ${characteristicsString.join(', ')};
       `)
       .catch((err) => setImmediate(() => console.log(err)));
-    }
 
     cb();
   },
@@ -190,9 +180,7 @@ module.exports = {
   report: (id, cb) => {
     pool
       .query(`
-        UPDATE reviews
-        SET reported = true
-        WHERE id = ${id};
+        UPDATE reviews SET reported = true WHERE id = ${id};
       `)
       .then(() => cb())
       .catch((err) => setImmediate(() => console.log(err)));
