@@ -1,6 +1,13 @@
 var pool = require('../db/postgres.js');
 const { v4: uuidv4 } = require('uuid');
 
+const addDoubleQuotes = (string) => {
+  if (string.indexOf("'") > -1) {
+    string = string.replace("'", "''");
+  }
+  return string;
+}
+
 module.exports = {
   getReviews: (id, cb) => {
     let reviews = {
@@ -109,21 +116,12 @@ module.exports = {
   },
 
   postReview: async (review, cb) => {
+    let reviewId = 0;
+
     const date = new Date();
-    let summary = review.summary;
-    let body = review.body;
-    let name = review.name;
-
-
-    if (review.summary.indexOf("'") > -1) {
-      summary = review.summary.replace("'", "''");
-    }
-    if (review.body.indexOf("'") > -1) {
-      body = review.body.replace("'", "''");
-    }
-    if (review.name.indexOf("'") > -1) {
-      name = review.name.replace("'", "''");
-    }
+    let summary = addDoubleQuotes(review.summary);
+    let body = addDoubleQuotes(review.body);
+    let name = addDoubleQuotes(review.name);
 
     const photos = JSON.stringify(review.photos.map((url) => {
       return {
@@ -132,7 +130,6 @@ module.exports = {
       }
     }));
 
-    let reviewId = 0;
     // add to reviews table
     await pool
       .query(`
@@ -144,10 +141,8 @@ module.exports = {
       .then(({ rows }) => { reviewId = rows[0].id })
       .catch((err) => setImmediate(() => console.log(err)));
 
-
     // add to review_characteristics table
     let characteristicsString = [];
-
     for (let key in review.characteristics) {
       characteristicsString.push(`(${reviewId}, ${key}, ${review.characteristics[key]})`);
     }
@@ -166,11 +161,7 @@ module.exports = {
     pool
       .query(`
         UPDATE reviews
-        SET helpfulness = (
-          SELECT helpfulness
-          FROM reviews
-          WHERE id = ${id}
-        ) + 1
+        SET helpfulness = (SELECT helpfulness FROM reviews WHERE id = ${id}) + 1
         WHERE id = ${id};
       `)
       .then(() => cb())
