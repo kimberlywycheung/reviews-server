@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var db = require('./db/postgres.js');
 var controller = require('./controllers/index.js');
@@ -11,6 +12,11 @@ var app = express();
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+
+//loaderio
+app.get(`/${process.env.LOADERIO_KEY}`, (req, res) => {
+  res.send(process.env.LOADERIO_KEY);
+});
 
 // router
 app.get('/reviews/:product_id', controller.getReviews);
