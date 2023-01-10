@@ -1,25 +1,27 @@
-const fs = require('fs');
-const { parse } = require('csv-parse');
-var pool = require('../db/postgres.js');
+// note: discontinued in favor of using postgres copy
 
-let reviews = [];
-let photos = [];
-let characteristics = [];
-let review_characteristics = [];
+// const fs = require('fs');
+// const { parse } = require('csv-parse');
+// var pool = require('../db/postgres.js');
 
-const parseData = (filename, saveTo) => {
-  fs.createReadStream(filename)
-  .pipe(parse({
-    delimiter: ',',
-    columns: true
-  })
-  .on('data', (row) => {
-    saveTo.push(row);
-  })
-  .on('end', () => {
-    console.log('finished');
-  })
-  .on('error', (err) => {
-    console.log(err.message);
-  }));
-};
+// let reviews = [];
+// let photos = [];
+// let characteristics = [];
+// let review_characteristics = [];
+
+// const parseData = (filename, saveTo) => {
+//   fs.createReadStream(filename)
+//   .pipe(parse({
+//     delimiter: ',',
+//     columns: true
+//   })
+//   .on('data', (row) => {
+//     saveTo.push(row);
+//   })
+//   .on('end', () => {
+//     console.log('finished');
+//   })
+//   .on('error', (err) => {
+//     console.log(err.message);
+//   }));
+// };
