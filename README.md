@@ -18,6 +18,7 @@ With an goal of 1000RPS with <1% error rate and <2000ms response time, Techstyle
 
 With the database and a single host server deployed to AWS, initial stress tests showed that the service performed at 2005ms avg latency with 0% error rate at 1000RPS.
 
+<details><summary>See More</summary>
 ![](assets/Pre-optimization.png)
 
 
@@ -27,6 +28,7 @@ NGINX cache & load balancer were implemented and deployed to distribute request 
 
 With these changes, latency decreased by 99.6%, handling 1000RPS at 8ms avg latency with 0.6% error rate.
 
+<details><summary>See More</summary>
 ![](assets/Post-optimization.png)
 
 ### Tech Stack:
