@@ -14,16 +14,15 @@ All load tests were performed via [loader.io](loader.io).
 
 With an goal of 1000RPS with <1% error rate and <2000ms response time, Techstyles Reviews & Ratings Service met 100% of these requirements. The above system supports 1000 client requests per second with an average response time of 8 milliseconds and 0.6% error rate.
 
+## Performance
+
+Baseline            | Post-optimization
+:-------------------------:|:-------------------------:
+![](assets/Pre-optimization.png)  |  ![](assets/Post-optimization.png)
+
 ### Initial Performance:
 
 With the database and a single host server deployed to AWS, initial stress tests showed that the service performed at 2005ms avg latency with 0% error rate at 1000RPS.
-
-<details>
-  <summary>See More</summary>
-  
-  ![](assets/Pre-optimization.png)
-
-</details>
 
 
 ### Post-Optimization Performance:
@@ -32,7 +31,6 @@ NGINX cache & load balancer were implemented and deployed to distribute request 
 
 With these changes, latency decreased by 99.6%, handling 1000RPS at 8ms avg latency with 0.6% error rate.
 
-![](assets/Post-optimization.png)
 
 ### Tech Stack:
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
