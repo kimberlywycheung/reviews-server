@@ -32,12 +32,7 @@ NGINX cache & load balancer were implemented and deployed to distribute request 
 
 With these changes, latency decreased by 99.6%, handling 1000RPS at 8ms avg latency with 0.6% error rate.
 
-<details>
-  <summary>See More</summary>
-
-  ![](assets/Post-optimization.png)
-  
-  </details>
+![](assets/Post-optimization.png)
 
 ### Tech Stack:
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
